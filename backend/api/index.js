@@ -6,6 +6,8 @@ const { readdirSync } = require("fs");
 const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
 const compression = require("compression");
+const path = require("path");
+const fs = require("fs");
 
 dotenv.config();
 
@@ -22,7 +24,14 @@ app.use(
 );
 
 //routes
-readdirSync("../routes").map((r) => app.use("/", require("../routes/" + r)));
+
+// backend dizinindeki 'routes' klasörüne mutlak yol ile erişim
+const routesPath = path.join(__dirname, "../routes"); // 'backend/routes' yolunu alır
+
+// routes klasöründeki dosyaları oku ve her birini 'app.use' ile kullan
+fs.readdirSync(routesPath).forEach((r) => {
+  app.use("/", require(path.join(routesPath, r)));
+});
 
 //database
 mongoose
