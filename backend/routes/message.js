@@ -7,8 +7,7 @@ const {
 
 const router = express.Router();
 
-router.post("/", authUser, sendMessage);
-
-router.get("/:convo_id", authUser, getMessages);
+router.post("/message", authUser, sendMessage);
+router.get("/message/:convo_id", authUser, getMessages);
 
 module.exports = router;
