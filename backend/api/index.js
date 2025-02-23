@@ -16,7 +16,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: "true" }));
 app.use(cookieParser());
 app.use(compression());
-app.use(cors());
+
+const corsOptions = {
+  origin: "https://www.one-clone.com", // Allow this origin
+  credentials: true, // Allow credentials like cookies or authorization headers
+};
+
+app.use(cors(corsOptions));
+
 app.use(
   fileUpload({
     useTempFiles: true,
