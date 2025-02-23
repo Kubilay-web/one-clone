@@ -100,3 +100,16 @@ exports.deletePost = async (req, res) => {
     return res.status(500).json({ message: error.message });
   }
 };
+
+exports.getAllPostsFromDatabase = async (req, res) => {
+  try {
+    const posts = await Post.find({})
+      .populate("user", "first_name last_name picture username cover")
+      .populate("comments.commentBy", "first_name last_name picture username")
+      .sort({ createdAt: -1 });
+
+    res.json(posts);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
