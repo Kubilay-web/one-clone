@@ -13,6 +13,8 @@ const { generateToken } = require("../helpers/tokens");
 const { sendVerificationEmail, sendResetCode } = require("../helpers/mailer");
 const generateCode = require("../helpers/generateCode");
 const mongoose = require("mongoose");
+const createHttpError = require("http-errors");
+const { searchUsers } = require("../services/user.service");
 exports.register = async (req, res) => {
   try {
     const {
@@ -612,6 +614,19 @@ exports.getFriendsPageInfos = async (req, res) => {
       requests: user.requests,
       sentRequests,
     });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.searchUsers = async (req, res) => {
+  try {
+    const keyword = req.query.search;
+    if (!keyword) {
+      throw createHttpError.BadRequest("Please add search term first.");
+    }
+    const users = await searchUsers(keyword, req.user.userId);
+    res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
