@@ -18,7 +18,7 @@ app.use(cookieParser());
 app.use(compression());
 
 const corsOptions = {
-  origin: "https://www.one-clone.com", // Allow this origin
+  origin: "http://localhost:3000", // Allow this origin
   credentials: true, // Allow credentials like cookies or authorization headers
 };
 
