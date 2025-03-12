@@ -5,11 +5,13 @@ import "./styles/icons/icons.css";
 import "./styles/dark.css";
 import App from "./App";
 import { BrowserRouter as Router } from "react-router-dom";
-import { createStore } from "redux";
 import { Provider } from "react-redux";
-import { composeWithDevTools } from "redux-devtools-extension";
-import rootReducer from "./reducers";
-const store = createStore(rootReducer, composeWithDevTools());
+import { configureStore } from "@reduxjs/toolkit"; // Redux Toolkit'ten configureStore'u içeri aktar
+import rootReducer from "./reducers"; // rootReducer'ı içeri aktar
+
+const store = configureStore({
+  reducer: rootReducer,
+});
 
 ReactDOM.render(
   <Provider store={store}>

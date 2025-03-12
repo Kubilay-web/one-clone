@@ -26,12 +26,6 @@ header {
   align-items: center;
   justify-content: center;
 }
-
-.flex {
-  display: flex;
-  align-items: normal;
-  gap: 10px;
-}
 .search {
   display: flex;
   align-items: center;

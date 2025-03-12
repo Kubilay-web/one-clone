@@ -12,12 +12,12 @@ import "./style.css";
 export default function Home({ setVisible, posts, loading, getAllPosts }) {
   const { user } = useSelector((state) => ({ ...state }));
   const middle = useRef(null);
-  // const [height, setHeight] = useState();
-  // useEffect(() => {
-  //   setHeight(middle.current.clientHeight);
-  // }, [loading, height]);
+  const [height, setHeight] = useState();
+  useEffect(() => {
+    setHeight(middle.current.clientHeight);
+  }, [loading, height]);
   return (
-    <div className="home">
+    <div className="home" style={{ height: `${height + 150}px` }}>
       <Header page="home" getAllPosts={getAllPosts} />
       <LeftHome user={user} />
       <div className="home_middle" ref={middle}>

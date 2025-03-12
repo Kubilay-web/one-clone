@@ -1,4 +1,3 @@
-// Başlangıç durumu
 const initialState = {
   status: "",
   error: "",

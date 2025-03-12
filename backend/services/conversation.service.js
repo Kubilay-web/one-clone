@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const ConversationModel = require("../models/ConversationModel");
+const MessageModel = require("../models/messageModel");
 
 exports.doesConversationExist = async (sender_id, receiver_id) => {
   let convos = await ConversationModel.find({

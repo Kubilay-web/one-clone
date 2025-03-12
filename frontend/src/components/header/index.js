@@ -41,8 +41,7 @@ export default function Header({ page, getAllPosts }) {
       <div className="header_left">
         <Link to="/" className="header_logo">
           <div className="circle">
-            {/* <Logo /> */}
-            <img src="/images/ONE.png" />
+            <Logo />
           </div>
         </Link>
         <div

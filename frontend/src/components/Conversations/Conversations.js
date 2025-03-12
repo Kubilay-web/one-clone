@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
-import moment from "moment";
 import { dateHandler } from "../../utils/date";
+import { getConversationId } from "../../utils/chat";
 
 const Conversations = () => {
   const dispatch = useDispatch();
@@ -11,10 +11,11 @@ const Conversations = () => {
   // State Yönetimi
   const [status, setStatus] = useState(""); // "loading", "succeeded", "failed"
   const [conversations, setConversations] = useState([]);
+  const [activeConversations, setActiveConversations] = useState(null); // Tek bir aktif konuşma
   const [error, setError] = useState("");
 
   // Redux'dan kullanıcı bilgilerini alıyoruz
-  const { user } = useSelector((state) => state);
+  const { user } = useSelector((state) => ({ ...state }));
   const token = user.token; // token'ı kullanıcı bilgisi üzerinden alıyoruz
 
   // Konuşmaları getiren fonksiyon
@@ -37,7 +38,36 @@ const Conversations = () => {
       console.log(data);
       setStatus("succeeded");
     } catch (error) {
-      // Hata durumunda hata mesajını state'e kaydediyoruz
+      setError(error.response?.data?.message || error.message);
+      setStatus("failed");
+    }
+  };
+
+  // Konuşma açma fonksiyonu
+  const openConversation = async (values) => {
+    if (!token) return;
+
+    setStatus("loading");
+    try {
+      // API'den konuşmayı alıyoruz
+      const { data } = await axios.post(
+        CONVERSATION_ENDPOINT,
+        { values },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Yeni bir konuşma açıyoruz (aktif konuşmayı sadece tek bir konuşma yapıyoruz)
+      setActiveConversations(data); // Sadece tıklanan konuşmayı aktif yapıyoruz
+
+      // Redux'a aktif konuşmayı dispatch ediyoruz
+      dispatch({ type: "SET_ACTIVE_CONVERSATION", payload: data });
+
+      setStatus("succeeded");
+    } catch (error) {
       setError(error.response?.data?.message || error.message);
       setStatus("failed");
     }
@@ -45,16 +75,9 @@ const Conversations = () => {
 
   // useEffect ile bileşen yüklendiğinde veya token değiştiğinde konuşmaları alıyoruz
   useEffect(() => {
-    let isMounted = true; // Bileşen unmounted olup olmadığını kontrol edeceğiz
-
     if (token) {
       getConversations();
     }
-
-    // Cleanup işlevi
-    return () => {
-      isMounted = false;
-    };
   }, [token]); // token değiştiğinde çalışacak
 
   // Yükleniyor durumu
@@ -73,10 +96,14 @@ const Conversations = () => {
         {conversations.length > 0 ? (
           conversations.map((conversation) => (
             <div key={conversation._id}>
-              {/* Displaying the participants for the conversation */}
-
-              {/* Displaying the latest message */}
-              <li className="list-none h-[72px] w-full dark:bg-dark_bg_1 bg-slate-500 hover:bg-dark_bg_2 cursor-pointer dark:text-dark_text_1 px-[10px]">
+              <li
+                onClick={() => openConversation()}
+                className={`list-none h-[72px] w-full dark:bg-dark_bg_1 bg-slate-500 hover:bg-dark_bg_2 cursor-pointer dark:text-dark_text_1 px-[10px] ${
+                  activeConversations?._id === conversation._id
+                    ? "bg-blue-500"
+                    : ""
+                }`}
+              >
                 <div className="relative w-full flex items-center justify-between py-[10px]">
                   <div className="flex items-center gap-x-3">
                     <div className="relative min-w-[50px] max-w-[50px] h-[50px] rounded-full overflow-hidden">
@@ -103,8 +130,6 @@ const Conversations = () => {
                     </span>
                   </div>
                 </div>
-
-                {/* {Border} */}
 
                 <div className="ml-16 border-b dark:border-b-dark_border_1"></div>
               </li>

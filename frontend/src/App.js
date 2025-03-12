@@ -17,7 +17,6 @@ import MessangerHome from "./pages/MessangerHome/MessangerHome";
 function App() {
   const [visible, setVisible] = useState(false);
   const { user, darkTheme } = useSelector((state) => ({ ...state }));
-  console.log(user);
   const [{ loading, error, posts }, dispatch] = useReducer(postsReducer, {
     loading: false,
     posts: [],
@@ -44,7 +43,10 @@ function App() {
         payload: data,
       });
     } catch (error) {
-      console.log(error);
+      dispatch({
+        type: "POSTS_ERROR",
+        payload: error.response.data.message,
+      });
     }
   };
 
@@ -101,7 +103,7 @@ function App() {
             exact
           />
           <Route path="/activate/:token" element={<Activate />} exact />
-          <Route path="/messanger" element={<MessangerHome />} />
+          <Route path="/messanger" element={<MessangerHome />} exact />
         </Route>
         <Route element={<NotLoggedInRoutes />}>
           <Route path="/login" element={<Login />} exact />

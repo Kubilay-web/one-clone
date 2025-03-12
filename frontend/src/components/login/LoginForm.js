@@ -38,14 +38,10 @@ export default function LoginForm({ setVisible }) {
         {
           email,
           password,
-        },
-        {
-          withCredentials: true,
         }
       );
       dispatch({ type: "LOGIN", payload: data });
       Cookies.set("user", JSON.stringify(data));
-      console.log(data);
       navigate("/");
     } catch (error) {
       setLoading(false);
@@ -55,7 +51,7 @@ export default function LoginForm({ setVisible }) {
   return (
     <div className="login_wrap">
       <div className="login_1">
-        <img src="../../images/ONE-CLONE.png" alt="" />
+        <img src="../../icons/facebook.svg" alt="" />
         <span>
           Facebook helps you connect and share with the people in your life.
         </span>

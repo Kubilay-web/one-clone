@@ -14,23 +14,20 @@ function Contact({ contact }) {
   const CONVERSATION_ENDPOINT = `${process.env.REACT_APP_BACKEND_URL}/conversation`; // API endpoint
 
   const openConversation = async (receiver_id) => {
-    if (!token) return;
+    if (!token) return; // Eğer token yoksa işlem yapma
 
-    setStatus("loading");
+    setStatus("loading"); // Yükleniyor durumuna geçiyoruz
     try {
-      // Konuşmayı açıyoruz ya da oluşturuyoruz
       const { data } = await axios.post(
-        CONVERSATION_ENDPOINT,
-        { receiver_id },
+        CONVERSATION_ENDPOINT, // Konuşma açma API endpoint'i
+        { receiver_id }, // Alıcı kimliği
         {
           headers: {
             Authorization: `Bearer ${token}`, // JWT token ile kimlik doğrulama
           },
         }
       );
-
-      // Redux'a aktif konuşmayı dispatch ediyoruz
-      dispatch({ type: "OPEN_CREATE_CONVERSATION_FULFILLED", payload: data }); // Yeni aktif konuşmayı Redux'a gönderiyoruz.
+      dispatch({ type: "OPEN_CREATE_CONVERSATION_FULFILLED", payload: data });
 
       setStatus("succeeded");
       console.log("Conversation opened: ", data);

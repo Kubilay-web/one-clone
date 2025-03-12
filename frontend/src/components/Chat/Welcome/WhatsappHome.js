@@ -1,4 +1,4 @@
-import { Logo } from "../../../svg2";
+import { Logo } from "../../../svg-2";
 
 export default function WhatsappHome() {
   return (
