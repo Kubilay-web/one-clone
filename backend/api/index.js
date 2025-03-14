@@ -68,6 +68,7 @@ const io = new Server(server, {
     allowedHeaders: ["Content-Type"], // You can add more headers if needed
     credentials: true, // Allow credentials like cookies
   },
+  allowEIO3: true,
 });
 
 io.on("connection", (socket) => {
