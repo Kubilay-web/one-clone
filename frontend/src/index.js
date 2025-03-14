@@ -11,6 +11,13 @@ import rootReducer from "./reducers"; // rootReducer'ı içeri aktar
 
 const store = configureStore({
   reducer: rootReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ["chat/addFiles"], // Bu aksiyon için serileştirme kontrolünü devre dışı bırak
+        ignoredPaths: ["chat.files"], // Bu yol (chat.files) için serileştirme kontrolünü devre dışı bırak
+      },
+    }),
 });
 
 ReactDOM.render(

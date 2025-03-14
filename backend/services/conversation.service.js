@@ -1,6 +1,5 @@
 const User = require("../models/User");
 const ConversationModel = require("../models/ConversationModel");
-const MessageModel = require("../models/messageModel");
 
 exports.doesConversationExist = async (sender_id, receiver_id) => {
   let convos = await ConversationModel.find({
@@ -35,8 +34,8 @@ exports.createConversation = async (data) => {
   }
 };
 
-exports.populateConversation = async (_id, fieldToPopulate, fieldsToRemove) => {
-  const populatedConvo = await ConversationModel.findOne({ id: _id }).populate(
+exports.populateConversation = async (id, fieldToPopulate, fieldsToRemove) => {
+  const populatedConvo = await ConversationModel.findOne({ _id: id }).populate(
     fieldToPopulate,
     fieldsToRemove
   );

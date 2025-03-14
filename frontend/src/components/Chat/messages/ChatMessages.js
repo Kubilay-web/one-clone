@@ -1,47 +1,54 @@
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getConversationMessages } from "../../../reducers/chatSlice";
+import { useEffect, useRef } from "react";
+import { useSelector } from "react-redux";
 import Message from "./Message";
+import Typing from "./Typing";
+import FileMessage from "./files/FileMessage";
 
-export default function ChatMessages() {
-  const dispatch = useDispatch();
+export default function ChatMessages({ typing }) {
+  const { messages, activeConversation } = useSelector((state) => state.chat);
   const { user } = useSelector((user) => ({ ...user }));
-  console.log("user", user);
-  const { messages, activeConversation } = useSelector((state) => state.chat); // Redux'tan messages ve activeConversation'ı alıyoruz
-  const token = user?.token;
-
-  const values = {
-    token,
-    convo_id: activeConversation?._id, // aktif sohbetin ID'si
-  };
-
-  console.log("messages", messages);
-
-  // activeConversation değiştiğinde mesajları yeniden çek
+  const endRef = useRef();
   useEffect(() => {
-    if (activeConversation?._id) {
-      dispatch(getConversationMessages(values));
-    }
-    // activeConversation değiştiğinde tekrar veri çekecek
-  }, [activeConversation, dispatch]);
-
-  console.log("activeConversation", activeConversation);
-
+    scrollToBottom();
+  }, [messages, typing]);
+  const scrollToBottom = () => {
+    endRef.current.scrollIntoView({ behavior: "smooth" });
+  };
   return (
-    <div className="mb-[60px] bg-[url('https://res.cloudinary.com/dmhcnhtng/image/upload/v1677358270/Untitled-1_copy_rpx8yb.jpg')] bg-cover bg-no-repeat">
+    <div
+      className="mb-[60px] bg-[url('https://res.cloudinary.com/dmhcnhtng/image/upload/v1677358270/Untitled-1_copy_rpx8yb.jpg')]
+    bg-cover bg-no-repeat
+    "
+    >
+      {/*Container*/}
       <div className="scrollbar overflow_scrollbar overflow-auto py-2 px-[5%]">
-        {/* Eğer messages varsa, her mesaj için Message bileşenini render et */}
-        {messages && messages.length > 0 ? (
+        {/*Messages*/}
+        {messages &&
           messages.map((message) => (
-            <Message
-              message={message}
-              key={message._id}
-              me={user.id === message.sender._id}
-            />
-          ))
-        ) : (
-          <p>No messages available</p> // Eğer mesaj yoksa, bu mesajı göster
-        )}
+            <>
+              {/*Message files */}
+              {message.files.length > 0
+                ? message.files.map((file) => (
+                    <FileMessage
+                      FileMessage={file}
+                      message={message}
+                      key={message._id}
+                      me={user.id === message.sender._id}
+                    />
+                  ))
+                : null}
+              {/*Message text*/}
+              {message.message.length > 0 ? (
+                <Message
+                  message={message}
+                  key={message._id}
+                  me={user.id === message.sender._id}
+                />
+              ) : null}
+            </>
+          ))}
+        {typing === activeConversation._id ? <Typing /> : null}
+        <div className="mt-2" ref={endRef}></div>
       </div>
     </div>
   );

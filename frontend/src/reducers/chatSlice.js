@@ -14,9 +14,9 @@ const initialState = {
   files: [],
 };
 
-// functions
+//functions
 export const getConversations = createAsyncThunk(
-  "conversations/all",
+  "conervsation/all",
   async (token, { rejectWithValue }) => {
     try {
       const { data } = await axios.get(CONVERSATION_ENDPOINT, {
@@ -30,15 +30,14 @@ export const getConversations = createAsyncThunk(
     }
   }
 );
-
 export const open_create_conversation = createAsyncThunk(
-  "conversations/open_create",
+  "conervsation/open_create",
   async (values, { rejectWithValue }) => {
-    const { token, receiver_id } = values;
+    const { token, receiver_id, isGroup } = values;
     try {
       const { data } = await axios.post(
         CONVERSATION_ENDPOINT,
-        { receiver_id },
+        { receiver_id, isGroup },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -51,9 +50,8 @@ export const open_create_conversation = createAsyncThunk(
     }
   }
 );
-
 export const getConversationMessages = createAsyncThunk(
-  "conversations/messages",
+  "conervsation/messages",
   async (values, { rejectWithValue }) => {
     const { token, convo_id } = values;
     try {
@@ -68,7 +66,6 @@ export const getConversationMessages = createAsyncThunk(
     }
   }
 );
-
 export const sendMessage = createAsyncThunk(
   "message/send",
   async (values, { rejectWithValue }) => {
@@ -93,9 +90,8 @@ export const sendMessage = createAsyncThunk(
     }
   }
 );
-
 export const createGroupConversation = createAsyncThunk(
-  "conversations/create_group",
+  "conervsation/create_group",
   async (values, { rejectWithValue }) => {
     const { token, name, users } = values;
     try {
@@ -114,24 +110,20 @@ export const createGroupConversation = createAsyncThunk(
     }
   }
 );
-
 export const chatSlice = createSlice({
   name: "chat",
   initialState,
   reducers: {
     setActiveConversation: (state, action) => {
-      // spread kullanarak activeConversation'ı güncelleme
-      state.activeConversation = {
-        ...state.activeConversation, // mevcut değerleri kopyala
-        ...action.payload, // payload'dan gelen yeni değerlerle güncelle
-      };
+      state.activeConversation = action.payload;
     },
     updateMessagesAndConversations: (state, action) => {
+      //update messages
       let convo = state.activeConversation;
       if (convo._id === action.payload.conversation._id) {
         state.messages = [...state.messages, action.payload];
       }
-
+      //update conversations
       let conversation = {
         ...action.payload.conversation,
         latestMessage: action.payload,
@@ -141,19 +133,11 @@ export const chatSlice = createSlice({
       );
       newConvos.unshift(conversation);
       state.conversations = newConvos;
-
-      // activeConversation'ı yine spread ile güncelliyoruz
-      if (state.activeConversation._id === conversation._id) {
-        state.activeConversation = {
-          ...state.activeConversation, // mevcut değerleri kopyala
-          ...conversation, // yeni conversation verilerini ekle
-        };
-      }
     },
     addFiles: (state, action) => {
       state.files = [...state.files, action.payload];
     },
-    clearFiles: (state) => {
+    clearFiles: (state, action) => {
       state.files = [];
     },
     removeFileFromFiles: (state, action) => {
@@ -165,7 +149,7 @@ export const chatSlice = createSlice({
   },
   extraReducers(builder) {
     builder
-      .addCase(getConversations.pending, (state) => {
+      .addCase(getConversations.pending, (state, action) => {
         state.status = "loading";
       })
       .addCase(getConversations.fulfilled, (state, action) => {
@@ -176,23 +160,19 @@ export const chatSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
       })
-      .addCase(open_create_conversation.pending, (state) => {
+      .addCase(open_create_conversation.pending, (state, action) => {
         state.status = "loading";
       })
       .addCase(open_create_conversation.fulfilled, (state, action) => {
         state.status = "succeeded";
-        // Yeni sohbeti activeConversation olarak güncelledik
-        state.activeConversation = {
-          ...state.activeConversation, // Eski activeConversation'ı kopyala
-          ...action.payload, // Yeni sohbeti ekle
-        };
+        state.activeConversation = action.payload;
         state.files = [];
       })
       .addCase(open_create_conversation.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload;
       })
-      .addCase(getConversationMessages.pending, (state) => {
+      .addCase(getConversationMessages.pending, (state, action) => {
         state.status = "loading";
       })
       .addCase(getConversationMessages.fulfilled, (state, action) => {
@@ -203,7 +183,7 @@ export const chatSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
       })
-      .addCase(sendMessage.pending, (state) => {
+      .addCase(sendMessage.pending, (state, action) => {
         state.status = "loading";
       })
       .addCase(sendMessage.fulfilled, (state, action) => {
@@ -219,14 +199,6 @@ export const chatSlice = createSlice({
         newConvos.unshift(conversation);
         state.conversations = newConvos;
         state.files = [];
-
-        // activeConversation'ı güncelledik
-        if (state.activeConversation._id === conversation._id) {
-          state.activeConversation = {
-            ...state.activeConversation, // Eski activeConversation'ı kopyala
-            ...conversation, // Yeni conversation verilerini ekle
-          };
-        }
       })
       .addCase(sendMessage.rejected, (state, action) => {
         state.status = "failed";
@@ -234,7 +206,6 @@ export const chatSlice = createSlice({
       });
   },
 });
-
 export const {
   setActiveConversation,
   updateMessagesAndConversations,

@@ -8,6 +8,8 @@ const cookieParser = require("cookie-parser");
 const compression = require("compression");
 const path = require("path");
 const fs = require("fs");
+const { Server } = require("socket.io");
+const SocketServer = require("./SocketServer.js");
 
 dotenv.config();
 
@@ -18,7 +20,7 @@ app.use(cookieParser());
 app.use(compression());
 
 const corsOptions = {
-  origin: "https://www.one-clone.com", // Allow this origin
+  origin: "http://localhost:3000", // Allow this origin
   credentials: true, // Allow credentials like cookies or authorization headers
 };
 
@@ -49,6 +51,23 @@ mongoose
   .catch((err) => console.log("error connecting to mongodb", err));
 
 const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => {
+
+let server;
+
+server = app.listen(PORT, () => {
   console.log(`server is running on port ${PORT}..`);
+});
+
+//socket.io
+
+const io = new Server(server, {
+  pingTimeout: 60000,
+  cors: {
+    origin: process.env.BASE_URL,
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("socket io connected successfully");
+  SocketServer(socket, io);
 });

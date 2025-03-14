@@ -1,16 +1,22 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import EmojiPickerApp from "./EmojiPicker";
-import Attachments from "./Attachments";
+import Attachments from "./attachments/Attachments";
 import { useSelector } from "react-redux";
 import Input from "./Input";
 import { SendIcon } from "../../../svg-2";
 import { useDispatch } from "react-redux";
 import { sendMessage } from "../../../reducers/chatSlice";
 import { ClipLoader } from "react-spinners";
+import SocketContext from "../../../context/SocketContext";
 
-export default function ChatActions() {
+function ChatActions({ socket }) {
   const [message, setMessage] = useState();
   const [loading, setLoading] = useState(false);
+
+  const [showPicker, setShowPicker] = useState(false);
+  const [showAttachments, setshowAttachments] = useState(false);
+
+  const textRef = useRef();
 
   const dispatch = useDispatch();
   const { user } = useSelector((user) => ({ ...user }));
@@ -26,8 +32,11 @@ export default function ChatActions() {
 
   const SendMessageHandler = async (e) => {
     e.preventDefault();
-    await dispatch(sendMessage(values));
+    setLoading(true);
+    let newMsg = await dispatch(sendMessage(values));
+    socket.emit("send message", newMsg.payload);
     setMessage("");
+    setLoading(false);
   };
 
   return (
@@ -37,12 +46,23 @@ export default function ChatActions() {
     >
       <div className="w-full flex items-center gap-x-2">
         <ul className="flex gap-x-2">
-          <EmojiPickerApp />
-          <Attachments />
+          <EmojiPickerApp
+            textRef={textRef}
+            message={message}
+            setMessage={setMessage}
+            showPicker={showPicker}
+            setShowPicker={setShowPicker}
+            setShowAttachments={setshowAttachments}
+          />
+          <Attachments
+            showAttachments={showAttachments}
+            setShowAttachments={setshowAttachments}
+            setShowPicker={setShowPicker}
+          />
         </ul>
-        <Input message={message} setMessage={setMessage} />
+        <Input message={message} setMessage={setMessage} textRef={textRef} />
         <button type="submit" className="btn">
-          {status === "loading" ? (
+          {status === "loading" && loading ? (
             <ClipLoader color="#E9EDEF" size={25} />
           ) : (
             <SendIcon className="dark:fill-dark_svg_1" />
@@ -52,3 +72,11 @@ export default function ChatActions() {
     </form>
   );
 }
+
+const ChatActionsWithSocket = (props) => (
+  <SocketContext.Consumer>
+    {(socket) => <ChatActions {...props} socket={socket} />}
+  </SocketContext.Consumer>
+);
+
+export default ChatActionsWithSocket;

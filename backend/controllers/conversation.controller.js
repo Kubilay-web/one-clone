@@ -3,8 +3,8 @@ const {
   createConversation,
   doesConversationExist,
   getUserConversations,
+  populateConversation,
 } = require("../services/conversation.service");
-const { populate } = require("../models/ConversationModel");
 
 exports.create_open_conversation = async (req, res) => {
   try {
@@ -23,10 +23,10 @@ exports.create_open_conversation = async (req, res) => {
     if (existed_conversation) {
       res.json(existed_conversation);
     } else {
-      let receiver_user = await findUser(receiver_id);
+      //let receiver_user = await findUser(receiver_id);
       let convoData = {
-        username: receiver_user.username,
-        picture: receiver_user.picture,
+        username: "conversation username",
+        picture: "conversation picture",
         isGroup: false,
         users: [sender_id, receiver_id],
       };

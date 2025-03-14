@@ -1,8 +1,9 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { open_create_conversation } from "../../../reducers/chatSlice";
+import SocketContext from "../../../context/SocketContext";
 
-const Contact = ({ contact }) => {
+function Contact({ contact, setSearchResults, socket }) {
   const dispatch = useDispatch();
   const { user } = useSelector((user) => ({ ...user }));
   const token = user.token;
@@ -12,16 +13,10 @@ const Contact = ({ contact }) => {
     token,
   };
 
-  const openConversation = () => {
-    dispatch(open_create_conversation(values))
-      .then(() => {
-        // Eğer sohbet başarılı bir şekilde oluşturulduysa sayfayı yenileyin
-        window.location.reload();
-      })
-      .catch((error) => {
-        // Hata durumunda hata mesajı loglama veya başka bir işlem yapılabilir
-        console.error("Error opening conversation: ", error);
-      });
+  const openConversation = async () => {
+    let newConvo = await dispatch(open_create_conversation(values));
+    socket.emit("join conversation", newConvo.payload._id);
+    setSearchResults([]);
   };
 
   return (
@@ -55,6 +50,14 @@ const Contact = ({ contact }) => {
       <div className="ml-16 border-b dark:border-b-dark_border_1"></div>
     </li>
   );
+}
+
+const ContactWithContext = (props) => {
+  return (
+    <SocketContext.Consumer>
+      {(socket) => <Contact {...props} socket={socket} />}
+    </SocketContext.Consumer>
+  );
 };
 
-export default Contact;
+export default ContactWithContext;

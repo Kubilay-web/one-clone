@@ -2,15 +2,11 @@ export const getConversationId = (user, users) => {
   return users[0]._id === user.id ? users[1]._id : users[0]._id;
 };
 
-export const getConversation = (user, contact) => {
-  return contact._id === user.id ? contact._id : user._id;
-};
-
 export const getConversationName = (user, users) => {
-  return users[0]._id === user._id ? users[1].username : users[0].username;
+  return users[0]._id === user.id ? users[1].username : users[0].username;
 };
 export const getConversationPicture = (user, users) => {
-  return users[0]._id === user._id ? users[1].picture : users[0].picture;
+  return users[0]._id === user.id ? users[1].picture : users[0].picture;
 };
 
 export const checkOnlineStatus = (onlineUsers, user, users) => {

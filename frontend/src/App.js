@@ -13,6 +13,8 @@ import axios from "axios";
 import { postsReducer } from "./functions/reducers";
 import Friends from "./pages/friends";
 import MessangerHome from "./pages/MessangerHome/MessangerHome";
+import { io } from "socket.io-client";
+import SocketContext from "./context/SocketContext";
 
 function App() {
   const [visible, setVisible] = useState(false);
@@ -50,66 +52,76 @@ function App() {
     }
   };
 
+  //socket.io part
+
+  const socket = io(process.env.REACT_APP_BACKEND_URL);
+
   return (
     <div className={darkTheme && "dark"}>
-      {visible && (
-        <CreatePostPopup
-          user={user}
-          setVisible={setVisible}
-          posts={posts}
-          dispatch={dispatch}
-        />
-      )}
-      <Routes>
-        <Route element={<LoggedInRoutes />}>
-          <Route
-            path="/profile"
-            element={
-              <Profile setVisible={setVisible} getAllPosts={getAllPosts} />
-            }
-            exact
+      <SocketContext.Provider value={socket}>
+        {visible && (
+          <CreatePostPopup
+            user={user}
+            setVisible={setVisible}
+            posts={posts}
+            dispatch={dispatch}
           />
-          <Route
-            path="/profile/:username"
-            element={
-              <Profile setVisible={setVisible} getAllPosts={getAllPosts} />
-            }
-            exact
-          />
-          <Route
-            path="/friends"
-            element={
-              <Friends setVisible={setVisible} getAllPosts={getAllPosts} />
-            }
-            exact
-          />
-          <Route
-            path="/friends/:type"
-            element={
-              <Friends setVisible={setVisible} getAllPosts={getAllPosts} />
-            }
-            exact
-          />
-          <Route
-            path="/"
-            element={
-              <Home
-                setVisible={setVisible}
-                posts={posts}
-                loading={loading}
-                getAllPosts={getAllPosts}
-              />
-            }
-            exact
-          />
-          <Route path="/activate/:token" element={<Activate />} exact />
-          <Route path="/messanger" element={<MessangerHome />} exact />
-        </Route>
-        <Route element={<NotLoggedInRoutes />}>
-          <Route path="/login" element={<Login />} exact />
-        </Route>
-        <Route path="/reset" element={<Reset />} />
-      </Routes>
+        )}
+        <Routes>
+          <Route element={<LoggedInRoutes />}>
+            <Route
+              path="/profile"
+              element={
+                <Profile setVisible={setVisible} getAllPosts={getAllPosts} />
+              }
+              exact
+            />
+            <Route
+              path="/profile/:username"
+              element={
+                <Profile setVisible={setVisible} getAllPosts={getAllPosts} />
+              }
+              exact
+            />
+            <Route
+              path="/friends"
+              element={
+                <Friends setVisible={setVisible} getAllPosts={getAllPosts} />
+              }
+              exact
+            />
+            <Route
+              path="/friends/:type"
+              element={
+                <Friends setVisible={setVisible} getAllPosts={getAllPosts} />
+              }
+              exact
+            />
+            <Route
+              path="/"
+              element={
+                <Home
+                  setVisible={setVisible}
+                  posts={posts}
+                  loading={loading}
+                  getAllPosts={getAllPosts}
+                />
+              }
+              exact
+            />
+            <Route path="/activate/:token" element={<Activate />} exact />
+            <Route
+              path="/messanger"
+              element={<MessangerHome socket={socket} />}
+              exact
+            />
+          </Route>
+          <Route element={<NotLoggedInRoutes />}>
+            <Route path="/login" element={<Login />} exact />
+          </Route>
+          <Route path="/reset" element={<Reset />} />
+        </Routes>
+      </SocketContext.Provider>
     </div>
   );
 }
