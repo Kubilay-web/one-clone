@@ -63,7 +63,7 @@ server = app.listen(PORT, () => {
 const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
-    origin: "https://www.one-clone.com", // Ensure this matches your frontend domain
+    origin: "*", // Ensure this matches your frontend domain
     methods: ["GET", "POST", "PUT", "DELETE"], // Allow both GET and POST requests
     allowedHeaders: ["Content-Type"], // You can add more headers if needed
     credentials: true, // Allow credentials like cookies
