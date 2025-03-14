@@ -63,15 +63,15 @@ server = app.listen(PORT, () => {
 const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
-    origin: "*", // Ensure this matches your frontend domain
-    methods: ["GET", "POST", "PUT", "DELETE"], // Allow both GET and POST requests
-    allowedHeaders: ["Content-Type"], // You can add more headers if needed
-    credentials: true, // Allow credentials like cookies
+    origin: "https://www.one-clone.com", // Sadece bu domain'e izin ver
+    methods: ["GET", "POST"], // GET ve POST isteklerine izin ver
+    allowedHeaders: ["Content-Type"], // Gerekirse diğer başlıkları buraya ekleyebilirsiniz
+    credentials: true, // Çerezler gibi kimlik doğrulama verilerini göndermeye izin ver
   },
-  allowEIO3: true,
+  allowEIO3: true, // Eski Socket.IO sürümüyle uyumluluğu sağlamak için
 });
 
 io.on("connection", (socket) => {
   console.log("socket io connected successfully");
-  SocketServer(socket, io);
+  SocketServer(socket, io); // Burada SocketServer fonksiyonunu çağırıyorsunuz
 });
